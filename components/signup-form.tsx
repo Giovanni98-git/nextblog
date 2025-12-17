@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Spinner } from "./ui/spinner";
 import Link from "next/link";
+import { Separator } from "./ui/separator";
 
 const SignUpFormSchema = z
   .object({
@@ -157,6 +158,7 @@ const SignUpForm = () => {
                 Sign in
               </Link>
             </p>
+            <Separator />
             <Button
               type="button"
               className="text-[13px] cursor-pointer"

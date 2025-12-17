@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Spinner } from "./ui/spinner";
 import Link from "next/link";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "./ui/separator";
 
 type SignInFormValues = z.infer<typeof SignInFormSchema>;
 
