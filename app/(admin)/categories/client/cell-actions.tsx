@@ -1,4 +1,5 @@
 "use client";
+import { removeCategory } from "@/app/actions/categories";
 import { Button } from "@/components/ui/button";
 import {
   DialogHeader,
@@ -28,6 +29,7 @@ export default function CellAction({ id, name }: CategoryProps) {
   const onRemoveCategory = async () => {
     try {
       setIsLoading(true);
+      await removeCategory(id);
     } catch (err: any) {
       throw new Error(`Something went wrong ${err?.message}`);
     } finally {

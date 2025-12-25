@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createCategory } from "@/app/actions/categories";
+import { createCategory, updateCategory } from "@/app/actions/categories";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,6 +32,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Spinner } from "@/components/ui/spinner";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name is required" }),
@@ -53,17 +55,25 @@ export default function CategoriesClient({
   const { open, setOpen, category, setCategory } = useCategories();
   const router = useRouter();
 
+  useEffect(() => {
+    if (category) {
+      form.setValue("name", category.name);
+    }
+  }, [category]);
+
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       if (category?.id) {
+        await updateCategory({ id: category.id, name: data.name });
+        toast.success("Category updated successfully");
       } else {
         await createCategory(data.name);
         toast.success("New category created successfully");
-        router.refresh();
-        form.reset();
-        setCategory({ id: "", name: "" });
-        setOpen(false);
       }
+      router.refresh();
+      form.reset();
+      setCategory({ id: "", name: "" });
+      setOpen(false);
     } catch (error: any) {
       toast.error(error?.message ?? "Something went wrong");
     }
@@ -72,7 +82,7 @@ export default function CategoriesClient({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} id="category-form">
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Edit Category</DialogTitle>
@@ -89,16 +99,24 @@ export default function CategoriesClient({
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="cursor-pointer">
-                Save changes
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                form="category-form"
+                disabled={
+                  !form.formState.isValid || form.formState.isSubmitting
+                }
+              >
+                {form.formState.isSubmitting ? (
+                  <Spinner className="size-6" />
+                ) : (
+                  "Save changes"
+                )}
               </Button>
             </DialogContent>
           </form>
         </Form>
       </Dialog>
-      <div className="p-8 flex flex-col">
-        <DataTable data={categories} columns={columns} />
-      </div>
 
       <div className="flex flex-col p-8 ">
         <div className="flex w-full justify-between">
@@ -117,6 +135,9 @@ export default function CategoriesClient({
             Create new category
           </Button>
         </div>
+      </div>
+      <div className="p-8 flex flex-col">
+        <DataTable data={categories} columns={columns} />
       </div>
     </>
   );
